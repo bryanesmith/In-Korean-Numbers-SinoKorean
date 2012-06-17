@@ -4,10 +4,10 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'In::Korean::Numbers',
+    NAME                => 'In::Korean::Numbers::SinoKorean',
     AUTHOR              => q{Bryan Smith <bryan@cpan.org>},
-    VERSION_FROM        => 'lib/In/Korean/Numbers.pm',
-    ABSTRACT_FROM       => 'lib/In/Korean/Numbers.pm',
+    VERSION_FROM        => 'lib/In/Korean/Numbers/SinoKorean.pm',
+    ABSTRACT_FROM       => 'lib/In/Korean/Numbers/SinoKorean.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')
       : ()),
@@ -16,5 +16,5 @@ WriteMakefile(
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'In-Korean-Numbers-*' },
+    clean               => { FILES => 'In-Korean-Numbers-SinoKorean-*' },
 );

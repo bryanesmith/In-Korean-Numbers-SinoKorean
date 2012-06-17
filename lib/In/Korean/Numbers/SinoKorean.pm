@@ -128,6 +128,10 @@ sub getInt {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Returns $self and $val values from arguments. Handles 
+# presence of $self (if o-o) and absence of $self (if 
+# procedural).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub get_args {
   my( $self, $val );
 
@@ -140,13 +144,22 @@ sub get_args {
   return ( $self, $val );
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Converts integer (e.g., 1) to Hangul block (e.g., 일) using
+# %int_to_char_map.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub int_to_char {
   my $int = shift;
   return $int_to_char_map{ $int };
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Converts hangul block (e.g., 일) to integer (e.g., 1) using 
+# %char_to_int_map.
+#
+# Note that %char_to_int_map is lazily created from 
+# %int_to_char_map.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub char_to_int {
   my $char = shift;
 
@@ -165,6 +178,8 @@ sub char_to_int {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Returns true if value is a positive integer or zero.
+#
 # Source: http://www.perlmonks.org/?node_id=614452
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub is_positive_int_or_zero {

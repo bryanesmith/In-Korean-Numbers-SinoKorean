@@ -2,7 +2,6 @@ package In::Korean::Numbers::SinoKorean;
 
 use utf8;
 use POSIX;
-use 5.006;
 use strict;
 use warnings;
 

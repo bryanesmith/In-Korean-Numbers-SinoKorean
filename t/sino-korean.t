@@ -68,7 +68,8 @@ my %tests = (
   692824=>'육십구만이천팔백이십사',
 );
 
-plan tests => 4 * scalar keys %tests ;
+my $test_count = 4 + 4 * scalar keys %tests;
+plan tests => $test_count;
 
 my $sk = In::Korean::Numbers::SinoKorean->new;
 
@@ -84,5 +85,15 @@ for my $int ( keys %tests ) {
 
   is( In::Korean::Numbers::SinoKorean::getInt( $hangul ), $int, 'Testing procedural: ' . $hangul . ' => ' . $int );
 }
+
+# Silently ignore too many args
+is( $sk->getHangul( 1, 2 ), '일', 'Should ignore exessive arguments.' );
+
+# Undef if no args
+is( $sk->getHangul(), undef, 'Should be undefined if no arguments.' );
+
+# Undef if not positive integer
+is( $sk->getHangul( -1), undef, 'Should be undefined if negative argument.' );
+is( $sk->getHangul( 1.5), undef, 'Should be undefined if not an integer.' );
 
 done_testing();

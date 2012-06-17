@@ -1,10 +1,20 @@
 use Test::More;
+use utf8;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use In::Korean::Numbers::SinoKorean;
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Source: http://stackoverflow.com/questions/492838/why-do-my-perl-tests-fail-with-use-encoding-utf8
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 my %tests = (
-  0 => '공',
+  0 => '영',
   1 => '일' ,
   2 => '이' ,
   3 => '삼' ,
@@ -58,16 +68,21 @@ my %tests = (
   692824=>'육십구만이천팔백이십사',
 );
 
-plan tests => 2 * scalar keys %tests ;
+plan tests => 4 * scalar keys %tests ;
 
 my $sk = In::Korean::Numbers::SinoKorean->new;
 
-for my $key ( keys %tests ) {
-  my $expected = $tests{ $key };
+for my $int ( keys %tests ) {
+  
+  my $hangul = $tests{ $int };
 
-  is( $sk->getHangul( $key ), $expected, 'Testing object-oriented: ' . $key . ' => ' . $expected );
+  is( $sk->getHangul( $int ), $hangul, 'Testing object-oriented: ' . $int . ' => ' . $hangul );
 
-  is( In::Korean::Numbers::SinoKorean::getHangul( $key ), $expected, 'Testing procedural: ' . $key . ' => ' . $expected );
+  is( In::Korean::Numbers::SinoKorean::getHangul( $int ), $hangul, 'Testing procedural: ' . $int . ' => ' . $hangul );
+
+  is( $sk->getInt( $hangul ), $int, 'Testing object-oriented: ' . $hangul . ' => ' . $int );
+
+  is( In::Korean::Numbers::SinoKorean::getInt( $hangul ), $int, 'Testing procedural: ' . $hangul . ' => ' . $int );
 }
 
-
+done_testing();

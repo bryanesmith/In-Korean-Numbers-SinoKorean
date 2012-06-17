@@ -225,8 +225,8 @@ C<In::Korean::Numbers::SinoKorean> object.
 =head2 getHangul
 Given a positive integer, returns string for Sino-Korean (as Hangul).
 
-  my $hangul = $sk->getHangul( 42 );       # 사십이
-  $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # 사십이
+    my $hangul = $sk->getHangul( 42 );       # 사십이
+    $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # 사십이
 
 =head2 getInt
 Given a positive integer in Sino-Korean (as Hangul), returns number.

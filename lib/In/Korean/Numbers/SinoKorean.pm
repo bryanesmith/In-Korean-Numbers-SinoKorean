@@ -28,9 +28,9 @@ my %int_to_char_map = (
   10000 => '만',
 );
 
-my %char_to_int_map; # Lazily created from 
+my %char_to_int_map; # Lazily created from %int_to_char_map
 
-# Numbers expressed in combination of the following units
+# All numbers are expressed as a combination of the following units
 my @units = (10000, 1000, 100, 10, 1);
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,17 +42,12 @@ sub new {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub getHangul {
 
-  my( $self, $num );
+  my( $self, $num ) = get_args( @_ );
 
-  if ( @_ == 2 ) {
-    ( $self, $num ) = @_; 
-  } elsif ( @_ == 1 ) {
-    ( $num ) = @_;
-  } else {
-    return undef; # Invalid input
-  }
+  return undef if not defined $num;
 
-  # Assert positive integer
+  # Must be positive integer
+  return undef if not is_positive_int_or_zero( $num );
   
   my @hangul = ();
 
@@ -86,15 +81,9 @@ sub getHangul {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub getInt {
 
-  my( $self, $hangul );
+  my( $self, $hangul ) = get_args( @_ );
 
-  if ( @_ == 2 ) {
-    ( $self, $hangul ) = @_; 
-  } elsif ( @_ == 1 ) {
-    ( $hangul ) = @_;
-  } else {
-    return undef; # Invalid input
-  }
+  return undef if not defined $hangul;
 
   # Tokenize so process each character separately
   my @tokens = split( //,  $hangul );
@@ -138,6 +127,19 @@ sub getInt {
   return $total;
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub get_args {
+  my( $self, $val );
+
+  if ( @_ >= 2 ) {
+    ( $self, $val ) = @_; 
+  } elsif ( @_ == 1 ) {
+    ( $val ) = @_;
+  } 
+  
+  return ( $self, $val );
+}
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sub int_to_char {
   my $int = shift;
@@ -163,6 +165,16 @@ sub char_to_int {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Source: http://www.perlmonks.org/?node_id=614452
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub is_positive_int_or_zero {
+  my $val = shift;
+  $val =~ s/^\s+//;          # leading whitespace
+  $val =~ s/\s+$//;          # trailing whitespace
+  return $val =~ /^[+]?\d+$/;
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 1;
 __END__
 
@@ -180,10 +192,15 @@ Version 0.01
 
     use In::Korean::Numbers;
 
+    # Object-oriented API
     my $sk     = In::Korean::Numbers::SinoKorean->new();
     my $hangul = $sk->getHangul( 42 );       # 사십이
     my $int    = $sk->getHangul( '백이십삼' );  # 123
-
+    
+    # Procedural API
+    $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # 사십이
+    $int    = In::Korean::Numbers::SinoKorean::getHangul( '백이십삼' );  # 123
+    
 =head1 SUBROUTINES/METHODS
 
 =head2 new
@@ -194,11 +211,12 @@ C<In::Korean::Numbers::SinoKorean> object.
 Given a positive integer, returns string for Sino-Korean (as Hangul).
 
   my $hangul = $sk->getHangul( 42 );       # 사십이
+  $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # 사십이
 
 =head2 getInt
 Given a positive integer in Sino-Korean (as Hangul), returns number.
 
     my $int    = $sk->getHangul( '백이십삼' );  # 123
+    $int    = In::Korean::Numbers::SinoKorean::getHangul( '백이십삼' );  # 123
 
 =cut
-

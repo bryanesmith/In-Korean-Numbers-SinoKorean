@@ -1,30 +1,29 @@
 package In::Korean::Numbers::SinoKorean;
 
-use utf8;
 use POSIX;
 use strict;
 use warnings;
 
-our $VERSION = '0.01'; # Also update POD version below
+our $VERSION = '0.02'; # Also update POD version below
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # Map Hangul to integer
 my %int_to_char_map = (
-  0 => '영',
-  1 => '일',
-  2 => '이',
-  3 => '삼',
-  4 => '사',
-  5 => '오',
-  6 => '육',
-  7 => '칠',
-  8 => '팔',
-  9 => '구',
-  10 => '십',
-  100 => '백',
-  1000 => '천',
-  10000 => '만',
+  0 => "\x{C601}",
+  1 => "\x{C77C}",
+  2 => "\x{C774}",
+  3 => "\x{C0BC}",
+  4 => "\x{C0AC}",
+  5 => "\x{C624}",
+  6 => "\x{C721}",
+  7 => "\x{CE60}",
+  8 => "\x{D314}",
+  9 => "\x{AD6C}",
+  10 => "\x{C2ED}",
+  100 => "\x{BC31}",
+  1000 =>"\x{CC9C}",
+  10000 => "\x{B9CC}",
 );
 
 my %char_to_int_map; # Lazily created from %int_to_char_map
@@ -74,7 +73,7 @@ sub getHangul {
 
   return join( '', @hangul ) if @hangul;
 
-  return '영';
+  return "\x{C601}";
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -96,8 +95,8 @@ sub getInt {
     # If invalid input, return undef
     return undef if ! defined( $char_int );
     
-    # If 만,  multiply everything by 10,000
-    if ( $char_char eq '만' ) {
+    # If "\x{B9CC}", multiply everything by 10,000
+    if ( $char_char eq "\x{B9CC}") {
       if ( $total ) {
         $total *= 10000;
       } else {
@@ -109,9 +108,9 @@ sub getInt {
     # If:
     #   (1) char value is greater than 9, 
     #   (2) no more characters left
-    #   (3) next character is 만 
+    #   (3) next character is "\x{B9CC}"
     # Then add value
-    elsif ( $char_int > 9 || ! @tokens || $tokens[0] eq '만' ) {
+    elsif ( $char_int > 9 || ! @tokens || $tokens[0] eq "\x{B9CC}") {
       $total += $char_int;
     }
 
@@ -144,7 +143,7 @@ sub get_args {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# Converts integer (e.g., 1) to Hangul block (e.g., 일) using
+# Converts integer (e.g., 1) to Hangul block (e.g., "\x{C77C}") using
 # %int_to_char_map.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub int_to_char {
@@ -153,7 +152,7 @@ sub int_to_char {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# Converts hangul block (e.g., 일) to integer (e.g., 1) using 
+# Converts hangul block (e.g., "\x{C77C}") to integer (e.g., 1) using 
 # %char_to_int_map.
 #
 # Note that %char_to_int_map is lazily created from 
@@ -198,7 +197,7 @@ In::Korean::Numbers::SinoKorean - Convert integers to Sino-Korean text (in Hangu
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -208,29 +207,32 @@ Version 0.01
 
     # Object-oriented API
     my $sk     = In::Korean::Numbers::SinoKorean->new();
-    my $hangul = $sk->getHangul( 42 );       # 사십이
-    my $int    = $sk->getHangul( '백이십삼' );  # 123
+    my $hangul = $sk->getHangul( 42 );       # "\x{C0AC}\x{C2ED}\x{C774}"
+    my $int    = $sk->getHangul( "\x{BC31}\x{C774}\x{C2ED}\x{C0BC}" );  # 123
     
     # Procedural API
-    $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # 사십이
-    $int    = In::Korean::Numbers::SinoKorean::getHangul( '백이십삼' );  # 123
+    $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # "\x{C0AC}\x{C2ED}\x{C774}"
+    $int    = In::Korean::Numbers::SinoKorean::getHangul( "\x{BC31}\x{C774}\x{C2ED}\x{C0BC}" );  # 123
     
 =head1 SUBROUTINES/METHODS
 
-=head2 new
+=head2 C<< new >>
+
 Constructor that takes no arguments returns a new
 C<In::Korean::Numbers::SinoKorean> object.
 
-=head2 getHangul
+=head2 C<< getHangul >>
+
 Given a positive integer, returns string for Sino-Korean (as Hangul).
 
-    my $hangul = $sk->getHangul( 42 );       # 사십이
-    $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # 사십이
+    my $hangul = $sk->getHangul( 42 );       # "\x{C0AC}\x{C2ED}\x{C774}"
+    $hangul = In::Korean::Numbers::SinoKorean::getHangul( 42 );       # "\x{C0AC}\x{C2ED}\x{C774}"
 
-=head2 getInt
+=head2 C<< getInt >>
+
 Given a positive integer in Sino-Korean (as Hangul), returns number.
 
-    my $int    = $sk->getHangul( '백이십삼' );  # 123
-    $int    = In::Korean::Numbers::SinoKorean::getHangul( '백이십삼' );  # 123
+    my $int    = $sk->getHangul( "\x{BC31}\x{C774}\x{C2ED}\x{C0BC}" );  # 123
+    $int    = In::Korean::Numbers::SinoKorean::getHangul( "\x{BC31}\x{C774}\x{C2ED}\x{C0BC}" );  # 123
 
 =cut

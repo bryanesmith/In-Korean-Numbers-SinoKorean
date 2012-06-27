@@ -3,3 +3,4 @@ Revision history for In-Korean-Numbers
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02    Use Unicode strings to represent Hangul characters.
